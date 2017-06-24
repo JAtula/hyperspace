@@ -1,17 +1,4 @@
 #cloud-config
-#cloud-config
-
-coreos:
-  etcd:
-    # Get a new discovery URL from https://discovery.etcd.io/new
-    discovery: <replace_with_your_discovery_url>
-    addr: $private_ipv4:4001
-    peer-addr: $private_ipv4:7001
-  units:
-    - name: etcd.service
-      command: start
-    - name: fleet.service
-      command: start
 
 write_files:
   - path: /etc/kontena-server.env
