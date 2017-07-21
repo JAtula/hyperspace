@@ -5,17 +5,19 @@ write_files:
     permissions: 0600
     owner: root
     content: |
-      KONTENA_VERSION=latest
-      KONTENA_VAULT_KEY=31m2lqP54cbS6HsI2OV0bF2ZEgbPxNrkpq7laDqmApUzJd2mC0MZcSozKYoH51PY
-      KONTENA_VAULT_IV=KGzwfRB908S8DhFhozln0pYTFQfg47GCSpUDRl9UQxy8l9Pd2jgdvmZQYSb5eyuw
-      KONTENA_INITIAL_ADMIN_CODE=Demo600
+      KONTENA_VERSION=${KONTENA_VERSION}
+      KONTENA_VAULT_KEY=${KONTENA_VAULT_KEY}
+      KONTENA_VAULT_IV=${KONTENA_VAULT_IV}
+      KONTENA_INITIAL_ADMIN_CODE=${KONTENA_INITIAL_ADMIN_CODE}
       SSL_CERT="/etc/kontena-server.pem"
+      MONGODB_URI=${MONGODB_URI}
+      RACK_ENV=${RACK_ENV}
 
   - path: /etc/kontena-server.pem
     permissions: 0600
     owner: root
     content: |
-            -----BEGIN CERTIFICATE-----
+      -----BEGIN CERTIFICATE-----
       MIIFpTCCA42gAwIBAgIJAMFl4gY7qMw1MA0GCSqGSIb3DQEBCwUAMGkxCzAJBgNV
       BAYTAkZJMRMwEQYDVQQIDApTb21lLVN0YXRlMREwDwYDVQQHDAhIZWxzaW5raTEh
       MB8GA1UECgwYSW50ZXJuZXQgV2lkZ2l0cyBQdHkgTHRkMQ8wDQYDVQQDDAZjb3Jl
@@ -116,16 +118,7 @@ write_files:
         -e SSL_CERT="$SSL_CERT" -e BACKEND_PORT=9292 \
         -p 80:80 -p 443:443 kontena/haproxy:latest
 coreos:
-  etcd:
-    # Get a new discovery URL from https://discovery.etcd.io/new
-    discovery: https://discovery.etcd.io/569eeb972592289939e3d9e0716d0d52
-    addr: $private_ipv4:4001
-    peer-addr: $private_ipv4:7001
   units:
-    - name: etcd.service
-      command: start
-    - name: fleet.service
-      command: start
     - name: kontena-server-mongo.service
       command: start
       enable: true
@@ -148,6 +141,8 @@ coreos:
         ExecStartPre=-/usr/bin/docker rm kontena-server-mongo
         ExecStart=/usr/bin/docker run --name=kontena-server-mongo \
             --volumes-from=kontena-server-mongo-data \
+            -e MONGODB_URI=${MONGODB_URI} \
+            -e RACK_ENV=${RACK_ENV} \
             mongo:3.0 mongod --smallfiles
         ExecStop=/usr/bin/docker stop kontena-server-mongo
 
@@ -173,7 +168,7 @@ coreos:
         ExecStartPre=/usr/bin/docker pull kontena/server:${KONTENA_VERSION}
         ExecStart=/usr/bin/docker run --name kontena-server-api \
             --link kontena-server-mongo:mongodb \
-            -e MONGODB_URI=mongodb://mongodb:27017/kontena_server \
+            -e MONGODB_URI=${MONGODB_URI} \
             -e VAULT_KEY=${KONTENA_VAULT_KEY} -e VAULT_IV=${KONTENA_VAULT_IV} \
             -e INITIAL_ADMIN_CODE=${KONTENA_INITIAL_ADMIN_CODE} \
             kontena/server:${KONTENA_VERSION}
