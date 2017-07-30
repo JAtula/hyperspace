@@ -49,15 +49,15 @@ resource "google_compute_firewall" "fwrule" {
     network = "default"
     allow {
         protocol = "tcp"
-        ports = ["80","443","22"]
+        ports = ["80","443","22","8000"]
     }
     target_tags = ["kontena-master"]
 }
-
+/*
 resource "google_compute_forwarding_rule" "fwd_rule" {
     name = "fwdrule"
     target = "${google_compute_target_pool.tpool.self_link}"
-    port_range = "22-443"
+    port_range = "22-8000"
 }
 
 resource "google_compute_target_pool" "tpool" {
@@ -67,8 +67,14 @@ resource "google_compute_target_pool" "tpool" {
     ]
 }
 
+
 output "lb_ip" {
   value = "${google_compute_forwarding_rule.fwd_rule.ip_address}"
+}
+*/
+
+output "master_access_config" {
+  value = "${google_compute_instance.kontena-master.access_config}"
 }
 
 // PHERIPERALS
