@@ -5,7 +5,7 @@ write_files:
     owner: root
     content: |
       KONTENA_URI="https://kontena-master"
-      KONTENA_TOKEN="dItWdyRlCAZIkV+r2+qxcxjACtNFbkR4Lz8g/aX6JHXgYMNR1H+e6toa35L4DHIpAYadV3Jz3+kDzmmle3381w=="
+      KONTENA_TOKEN="oPy1wyPs/gN+g/QLejn/8zcG3v5egvDvjoY4DlW5Yey8XU6rxmkiu7dzm7L2nz1SaohhjAXdw6nE2vLI56M5RQ=="
       KONTENA_PEER_INTERFACE=eth1
       KONTENA_VERSION=latest
   - path: /etc/systemd/system/docker.service.d/50-kontena.conf
@@ -27,7 +27,7 @@ coreos:
       content: |
         # default should not match virtual Docker/weave bridge/veth network interfaces
         [Match]
-        Name=eth*
+        Name=
 
         [Network]
         DHCP=yes

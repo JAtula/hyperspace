@@ -44,34 +44,16 @@ resource "google_compute_instance" "kontena-master" {
 //
 // NETWORKING
 //
+
 resource "google_compute_firewall" "fwrule" {
     name = "kontena-master-fwr"
     network = "default"
     allow {
         protocol = "tcp"
-        ports = ["80","443","22","8000"]
+        ports = ["80","443","22"]
     }
     target_tags = ["kontena-master"]
 }
-/*
-resource "google_compute_forwarding_rule" "fwd_rule" {
-    name = "fwdrule"
-    target = "${google_compute_target_pool.tpool.self_link}"
-    port_range = "22-8000"
-}
-
-resource "google_compute_target_pool" "tpool" {
-    name = "tpool"
-    instances = [
-        "${google_compute_instance.kontena-master.*.self_link}"
-    ]
-}
-
-
-output "lb_ip" {
-  value = "${google_compute_forwarding_rule.fwd_rule.ip_address}"
-}
-*/
 
 output "master_access_config" {
   value = "${google_compute_instance.kontena-master.access_config}"
@@ -88,9 +70,6 @@ data "template_file" "cloud_config" {
     KONTENA_VAULT_KEY = "31m2lqP54cbS6HsI2OV0bF2ZEgbPxNrkpq7laDqmApUzJd2mC0MZcSozKYoH51PY"
     KONTENA_VAULT_IV = "KGzwfRB908S8DhFhozln0pYTFQfg47GCSpUDRl9UQxy8l9Pd2jgdvmZQYSb5eyuw"
     KONTENA_INITIAL_ADMIN_CODE = "Demo600"
-    MONGODB_URI = "mongodb://mongoadmin:Perse500@mongodb-1:10481,mongodb-2:10481/kontena-master?replicaSet=kontena-master"
-    RACK_ENV = "production"
   }
     
 }
-
