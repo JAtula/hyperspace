@@ -5,9 +5,9 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 provider "google" {
-  credentials = ""
-  project      = "modern-girder-157718"
-  region       = "us-central1"
+  credentials = "${file("hyperspace-1dca531e62dc.json")}"
+  project     = "hyperspace-171711"
+  region      = "europe-west1"
 }
 
 //
@@ -15,15 +15,15 @@ provider "google" {
 //
 
 resource "google_compute_instance" "kontena-master" {
-  name         = "${format("kontena-master", count.index)}"
+  name         = "${format("kontena-master-%d", count.index)}"
   machine_type = "n1-standard-1"
-  zone         = "us-central1-f"
+  zone         = "europe-west1-b"
   tags         = ["kontena-master"]
 
   disk {
-    source_image = "coreos-stable-1409-5-0-v20170623"
+    image = "coreos-stable-1409-5-0-v20170623"
     auto_delete  = true
-    boot         = true
+    type         = "pd-ssd"
   }
 
   network_interface {
@@ -32,7 +32,7 @@ resource "google_compute_instance" "kontena-master" {
           // Ephemeral IP
       }
   }
-  count = 3
+  count = 1
   lifecycle = {
     create_before_destroy = true
   }
@@ -42,62 +42,14 @@ resource "google_compute_instance" "kontena-master" {
 }
 
 //
-// WORKER NODES
-//
-
-/*
-resource "google_compute_instance_template" "kontena_node" {
-  name_prefix  = "kontena-node"
-  machine_type = "g1-small"
-  region       = "europe-west1"
-
-  // boot disk
-  disk {
-    source_image = "coreos-stable-1409-5-0-v20170623"
-    auto_delete  = true
-    boot         = true
-  }
-
-  // networking
-  network_interface {
-    network = "default"
-  }
-
-  lifecycle {
-    create_before_destroy = true
-  }
-
-  metadata  {
-    user-data="${data.template_file.cloud_config_nodes.rendered}"
-  }
-}
-
-
-resource "google_compute_instance_group_manager" "kontena_node_manager" {
-  name               = "kontena-node-group-manager"
-  instance_template  = "${google_compute_instance_template.kontena_node.self_link}"
-  base_instance_name = "kontena-node"
-  zone               = "europe-west1-b"
-  target_size        = "6"
-
-
-}
-
-data "template_file" "cloud_config_nodes" {
-
-    template = "${file("cloud-config-node.yaml.tpl")}"   
-}
-*/
-
-//
 // NETWORKING
 //
 resource "google_compute_firewall" "fwrule" {
-    name = "hyperspace-web"
+    name = "kontena-master-fwr"
     network = "default"
     allow {
         protocol = "tcp"
-        ports    = ["22","80", "443", "9292"]
+        ports = ["80","443","22"]
     }
     target_tags = ["kontena-master"]
 }
@@ -105,49 +57,18 @@ resource "google_compute_firewall" "fwrule" {
 resource "google_compute_forwarding_rule" "fwd_rule" {
     name = "fwdrule"
     target = "${google_compute_target_pool.tpool.self_link}"
-    port_range = "443"
+    port_range = "22-443"
 }
 
 resource "google_compute_target_pool" "tpool" {
     name = "tpool"
     instances = [
-        "${google_compute_instance.kontena-master.self_link}"
+        "${google_compute_instance.kontena-master.*.self_link}"
     ]
 }
 
-resource "google_compute_ssl_certificate" "master-cert" {
-  name        = "ha-certs"
-  description = "Certificates for master"
-  private_key = "${file("private.key")}"
-  certificate = "${file("cert.crt")}"
-}
-
-resource "google_compute_target_https_proxy" "kontena-master-proxy" {
-  name        = "kontena-master-proxy"
-  description = "A proxy for incoming connections to Kontena master"
-  url_map     = "${google_compute_url_map.kontena-master-url.self_link}"
-   ssl_certificates = ["${google_compute_ssl_certificate.master-cert.self_link}"]
-}
-
-resource "google_compute_url_map" "kontena-master-url" {
-  name            = "kontena-master"
-  description     = "An URL map for Kontena master"
-  default_service = "${google_compute_instance.kontena-master.self_link}"
-
-  host_rule {
-    hosts        = ["kontena-master"]
-    path_matcher = "allpaths"
-  }
-
-  path_matcher {
-    name            = "allpaths"
-    default_service = "${google_compute_instance.kontena-master.self_link}"
-
-    path_rule {
-      paths   = ["/*"]
-      service = "${google_compute_instance.kontena-master.self_link}"
-    }
-  }
+output "lb_ip" {
+  value = "${google_compute_forwarding_rule.fwd_rule.ip_address}"
 }
 
 // PHERIPERALS
@@ -167,6 +88,3 @@ data "template_file" "cloud_config" {
     
 }
 
-output "lb_ip" {
-  value = "${google_compute_forwarding_rule.fwd_rule.ip_address}"
-}
