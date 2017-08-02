@@ -55,9 +55,6 @@ resource "google_compute_firewall" "fwrule" {
     target_tags = ["kontena-master"]
 }
 
-output "master_access_config" {
-  value = "${google_compute_instance.kontena-master.access_config}"
-}
 
 // PHERIPERALS
 

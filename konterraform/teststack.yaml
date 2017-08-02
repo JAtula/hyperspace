@@ -1,0 +1,44 @@
+stack: examples/wordpress
+version: 0.3.0
+variables:
+  wordpress-mysql-root:
+    type: string
+    from:
+      vault: wordpress-mysql-root
+      random_string: 32
+    to:
+      vault: wordpress-mysql-root
+  wordpress-mysql-password:
+    type: string
+    from:
+      vault: wordpress-mysql-password
+      random_string: 32
+    to:
+      vault: wordpress-mysql-password
+services:
+  wordpress:
+    image: wordpress:4.6
+    stateful: true
+    ports:
+      - 80:80
+    environment:
+      WORDPRESS_DB_HOST: mysql
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_NAME: wordpress
+    secrets:
+      - secret: wordpress-mysql-password
+        name: WORDPRESS_DB_PASSWORD
+        type: env
+  mysql:
+    image: mariadb:5.5
+    stateful: true
+    environment:
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+    secrets:
+      - secret: wordpress-mysql-root
+        name: MYSQL_ROOT_PASSWORD
+        type: env
+      - secret: wordpress-mysql-password
+        name: MYSQL_PASSWORD
+        type: env

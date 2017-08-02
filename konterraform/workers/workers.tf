@@ -27,7 +27,7 @@ resource "google_compute_instance_group_manager" "workers" {
   instance_template  = "${google_compute_instance_template.worker-node.self_link}"
   base_instance_name = "worker-node"
   zone               = "europe-west1-b"
-  target_size        = 1
+  target_size        = 3
 }
 
 resource "google_compute_instance_template" "worker-node" {
@@ -36,6 +36,9 @@ resource "google_compute_instance_template" "worker-node" {
 
   network_interface {
     network = "default"
+    access_config {
+      //Ephemeral IP address
+    }
   }
 
   disk {
@@ -46,6 +49,7 @@ resource "google_compute_instance_template" "worker-node" {
   metadata  {
     user-data="${data.template_file.cloud_config_nodes.rendered}"
   }
+
 }
 
 resource "google_compute_http_health_check" "default" {
@@ -60,10 +64,10 @@ data "template_file" "cloud_config_nodes" {
     template = "${file("/Users/juhaniatula/Documents/dev/hyperspace/konterraform/cloud-config-node.yaml.tpl")}"
 
   vars {
-    KONTENA_VERSION = "1.3"
-    KONTENA_URI="https://kontena-master"
-    KONTENA_TOKEN="dItWdyRlCAZIkV+r2+qxcxjACtNFbkR4Lz8g/aX6JHXgYMNR1H+e6toa35L4DHIpAYadV3Jz3+kDzmmle3381w=="
-    KONTENA_PEER_INTERFACE="eth1"
+    KONTENA_VERSION="1.3"
+    KONTENA_URI="https://10.132.0.2"
+    KONTENA_TOKEN="asd123asd"
+    KONTENA_PEER_INTERFACE="ens4v1"
    
    }
     
@@ -92,3 +96,15 @@ resource "google_compute_url_map" "default" {
   default_service = "${google_compute_backend_service.worker-node.self_link}"
 
 }
+
+// PUBLIC FACING LOAD BALANCER
+
+resource "google_compute_global_forwarding_rule" "default" {
+  name       = "lb"
+  target     = "${google_compute_target_https_proxy.default.self_link}"
+  port_range = "443"
+}
+
+//output "worker_lb_access" {
+//  value = "${google_compute_target_https_proxy.default.}"
+//}

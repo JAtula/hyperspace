@@ -4,10 +4,10 @@ write_files:
     permissions: 0600
     owner: root
     content: |
-      KONTENA_VERSION=latest
-      KONTENA_VAULT_KEY=<your vault_key>
-      KONTENA_VAULT_IV=<your vault_iv>
-      KONTENA_INITIAL_ADMIN_CODE=<initial_admin_code>
+      KONTENA_VERSION=${KONTENA_VERSION}
+      KONTENA_VAULT_KEY=${KONTENA_VAULT_KEY}
+      KONTENA_VAULT_IV=${KONTENA_VAULT_IV}
+      KONTENA_INITIAL_ADMIN_CODE=${KONTENA_INITIAL_ADMIN_CODE}
       SSL_CERT="/etc/kontena-server.pem"
 
   - path: /etc/kontena-server.pem
