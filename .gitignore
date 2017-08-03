@@ -29,3 +29,5 @@ tmp/*
 
 terraform.tfstate
 terraform.tfstate.backup
+konterraform/terraform.tfstate*
+konterraform/workers/terraform.tfstate*
