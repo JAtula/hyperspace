@@ -5,8 +5,8 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 provider "google" {
-  credentials = "${file("hyperspace-1dca531e62dc.json")}"
-  project     = "hyperspace-171711"
+  credentials = "${file("konterraform-f36234d1ed7d.json")}"
+  project     = "konterraform"
   region      = "europe-west1"
 }
 
@@ -52,7 +52,7 @@ resource "google_compute_firewall" "fwrule" {
         protocol = "tcp"
         ports = ["80","443","22"]
     }
-    target_tags = ["kontena-master"]
+
 }
 
 

@@ -16,19 +16,27 @@ variables:
     to:
       vault: wordpress-mysql-password
 services:
+  internet_lb:
+    image: kontena/lb:latest
+    ports:
+      - 80:80
   wordpress:
     image: wordpress:4.6
     stateful: true
-    ports:
-      - 80:80
     environment:
       WORDPRESS_DB_HOST: mysql
       WORDPRESS_DB_USER: wordpress
       WORDPRESS_DB_NAME: wordpress
+      KONTENA_LB_MODE: http
+      KONTENA_LB_BALANCE: roundrobin
+      KONTENA_LB_INTERNAL_PORT: 80
+      KONTENA_LB_VIRTUAL_HOSTS: www.demo.io,demo.io
     secrets:
       - secret: wordpress-mysql-password
         name: WORDPRESS_DB_PASSWORD
         type: env
+    links:
+      - internet_lb
   mysql:
     image: mariadb:5.5
     stateful: true

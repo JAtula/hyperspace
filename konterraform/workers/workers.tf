@@ -1,6 +1,6 @@
 provider "google" {
-  credentials = "${file("/Users/juhaniatula/Documents/dev/hyperspace/konterraform/hyperspace-1dca531e62dc.json")}"
-  project     = "hyperspace-171711"
+  credentials = "${file("/Users/juhaniatula/Documents/dev/hyperspace/konterraform/konterraform-f36234d1ed7d.json")}"
+  project     = "konterraform"
   region      = "europe-west1"
 }
 
@@ -10,8 +10,8 @@ provider "google" {
 resource "google_compute_backend_service" "worker-node" {
   name        = "worker-node"
   description = "Worker nodes backend service"
-  port_name   = "http"
-  protocol    = "HTTP"
+  port_name   = "https"
+  protocol    = "HTTPS"
   timeout_sec = 10
   enable_cdn  = false
 
@@ -19,7 +19,7 @@ resource "google_compute_backend_service" "worker-node" {
     group = "${google_compute_instance_group_manager.workers.instance_group}"
   }
 
-  health_checks = ["${google_compute_http_health_check.default.self_link}"]
+  health_checks = ["${google_compute_https_health_check.default.self_link}"]
 }
 
 resource "google_compute_instance_group_manager" "workers" {
@@ -28,6 +28,11 @@ resource "google_compute_instance_group_manager" "workers" {
   base_instance_name = "worker-node"
   zone               = "europe-west1-b"
   target_size        = 3
+  
+  named_port {
+    name = "https"
+    port = 443
+  }
 }
 
 resource "google_compute_instance_template" "worker-node" {
@@ -52,7 +57,7 @@ resource "google_compute_instance_template" "worker-node" {
 
 }
 
-resource "google_compute_http_health_check" "default" {
+resource "google_compute_https_health_check" "default" {
   name               = "test"
   request_path       = "/"
   check_interval_sec = 1
@@ -103,6 +108,15 @@ resource "google_compute_global_forwarding_rule" "default" {
   name       = "lb"
   target     = "${google_compute_target_https_proxy.default.self_link}"
   port_range = "443"
+}
+
+resource "google_compute_firewall" "fwrule" {
+    name = "kontena-workers-fwr"
+    network = "default"
+    allow {
+        protocol = "tcp"
+        ports = ["80","443","22"]
+    }
 }
 
 //output "worker_lb_access" {
