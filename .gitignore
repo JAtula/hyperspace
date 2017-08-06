@@ -3,3 +3,4 @@ konterraform/workers/terraform.tfstate*
 konterraform/*.json
 konterraform/private.key
 konterraform/*.c*
+konterraform/kontena-master.pem
