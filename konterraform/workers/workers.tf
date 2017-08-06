@@ -10,8 +10,8 @@ provider "google" {
 resource "google_compute_backend_service" "worker-node" {
   name        = "worker-node"
   description = "Worker nodes backend service"
-  port_name   = "https"
-  protocol    = "HTTPS"
+  port_name   = "http"
+  protocol    = "HTTP"
   timeout_sec = 10
   enable_cdn  = false
 
@@ -19,7 +19,7 @@ resource "google_compute_backend_service" "worker-node" {
     group = "${google_compute_instance_group_manager.workers.instance_group}"
   }
 
-  health_checks = ["${google_compute_https_health_check.default.self_link}"]
+  health_checks = ["${google_compute_http_health_check.default.self_link}"]
 }
 
 resource "google_compute_instance_group_manager" "workers" {
@@ -30,8 +30,8 @@ resource "google_compute_instance_group_manager" "workers" {
   target_size        = 3
   
   named_port {
-    name = "https"
-    port = 443
+    name = "http"
+    port = 80
   }
 }
 
@@ -57,7 +57,7 @@ resource "google_compute_instance_template" "worker-node" {
 
 }
 
-resource "google_compute_https_health_check" "default" {
+resource "google_compute_http_health_check" "default" {
   name               = "test"
   request_path       = "/"
   check_interval_sec = 1
@@ -99,6 +99,21 @@ resource "google_compute_url_map" "default" {
   description = "a description"
 
   default_service = "${google_compute_backend_service.worker-node.self_link}"
+
+  host_rule {
+    hosts        = ["www.demo.io"]
+    path_matcher = "allpaths"
+  }
+
+  path_matcher {
+    name            = "allpaths"
+    default_service = "${google_compute_backend_service.worker-node.self_link}"
+
+    path_rule {
+      paths   = ["/*"]
+      service = "${google_compute_backend_service.worker-node.self_link}"
+    }
+  }
 
 }
 
