@@ -1,52 +1,8 @@
 stack: demo/hyperspace
 version: 1.0.0
 variables:
-  wordpress-mysql-root:
-    type: string
-    from:
-      vault: wordpress-mysql-root
-      random_string: 32
-    to:
-      vault: wordpress-mysql-root
-  wordpress-mysql-password:
-    type: string
-    from:
-      vault: wordpress-mysql-password
-      random_string: 32
-    to:
-      vault: wordpress-mysql-password
 services:
-  internet_lb:
-    image: kontena/lb:latest
+  hyperspace:
+    image: jatula/hyperspace:0.1
     ports:
-      - 80:80
-  wordpress:
-    image: wordpress:4.6
-    stateful: true
-    environment:
-      WORDPRESS_DB_HOST: mysql
-      WORDPRESS_DB_USER: wordpress
-      WORDPRESS_DB_NAME: wordpress
-      KONTENA_LB_MODE: http
-      KONTENA_LB_BALANCE: roundrobin
-      KONTENA_LB_INTERNAL_PORT: 80
-      KONTENA_LB_VIRTUAL_HOSTS: www.demo.io,demo.io
-    secrets:
-      - secret: wordpress-mysql-password
-        name: WORDPRESS_DB_PASSWORD
-        type: env
-    links:
-      - internet_lb
-  mysql:
-    image: mariadb:5.5
-    stateful: true
-    environment:
-      MYSQL_DATABASE: wordpress
-      MYSQL_USER: wordpress
-    secrets:
-      - secret: wordpress-mysql-root
-        name: MYSQL_ROOT_PASSWORD
-        type: env
-      - secret: wordpress-mysql-password
-        name: MYSQL_PASSWORD
-        type: env
+      - 80:9393
