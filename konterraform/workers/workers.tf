@@ -1,5 +1,11 @@
+// Copyright 2017 Google Inc. All Rights Reserved.
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
 provider "google" {
-  credentials = "${file("/Users/juhaniatula/Documents/dev/hyperspace/konterraform/konterraform-f36234d1ed7d.json")}"
+  credentials = "${file("konterraform-f36234d1ed7d.json")}"
   project     = "konterraform"
   region      = "europe-west1"
 }
@@ -35,6 +41,23 @@ resource "google_compute_instance_group_manager" "workers" {
   }
 }
 
+resource "google_compute_autoscaler" "autoscaler" {
+  name   = "scaler"
+  zone   = "europe-west1-b"
+  target = "${google_compute_instance_group_manager.workers.self_link}"
+
+  autoscaling_policy = {
+    max_replicas    = 6
+    min_replicas    = 3
+    cooldown_period = 300
+
+    cpu_utilization {
+      target = 0.8
+    }
+  }
+}
+
+
 resource "google_compute_instance_template" "worker-node" {
   name         = "kontena-test"
   machine_type = "g1-small"
@@ -66,13 +89,14 @@ resource "google_compute_http_health_check" "default" {
 
 data "template_file" "cloud_config_nodes" {
 
-    template = "${file("/Users/juhaniatula/Documents/dev/hyperspace/konterraform/cloud-config-node.yaml.tpl")}"
+    template = "${var.template_file_workers}"
 
   vars {
-    KONTENA_VERSION="1.3"
-    KONTENA_URI="https://10.132.0.2"
-    KONTENA_TOKEN="asd123asd"
-    KONTENA_PEER_INTERFACE="ens4v1"
+
+    kontena_version = "${var.kontena_version}"
+    kontena_uri = "${var.kontena_uri}"
+    kontena_worker_token = "${var.kontena_worker_token}"
+    kontena_peer_interface = "${var.kontena_peer_interface}"
    
    }
     
@@ -133,7 +157,3 @@ resource "google_compute_firewall" "fwrule" {
         ports = ["80","443","22"]
     }
 }
-
-//output "worker_lb_access" {
-//  value = "${google_compute_target_https_proxy.default.}"
-//}

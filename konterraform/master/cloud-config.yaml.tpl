@@ -4,10 +4,10 @@ write_files:
     permissions: 0600
     owner: root
     content: |
-      KONTENA_VERSION=${KONTENA_VERSION}
-      KONTENA_VAULT_KEY=${KONTENA_VAULT_KEY}
-      KONTENA_VAULT_IV=${KONTENA_VAULT_IV}
-      KONTENA_INITIAL_ADMIN_CODE=${KONTENA_INITIAL_ADMIN_CODE}
+      KONTENA_VERSION=${kontena_version}
+      KONTENA_VAULT_KEY=${kontena_vault_key}
+      KONTENA_VAULT_IV=${kontena_vault_iv}
+      KONTENA_INITIAL_ADMIN_CODE=${kontena_initial_admin_code}
       SSL_CERT="/etc/kontena-server.pem"
 
   - path: /etc/kontena-server.pem
@@ -118,13 +118,13 @@ coreos:
         EnvironmentFile=/etc/kontena-server.env
         ExecStartPre=-/usr/bin/docker stop kontena-server-api
         ExecStartPre=-/usr/bin/docker rm kontena-server-api
-        ExecStartPre=/usr/bin/docker pull kontena/server:${KONTENA_VERSION}
+        ExecStartPre=/usr/bin/docker pull kontena/server:${kontena_version}
         ExecStart=/usr/bin/docker run --name kontena-server-api \
             --link kontena-server-mongo:mongodb \
             -e MONGODB_URI=mongodb://mongodb:27017/kontena_server \
-            -e VAULT_KEY=${KONTENA_VAULT_KEY} -e VAULT_IV=${KONTENA_VAULT_IV} \
-            -e INITIAL_ADMIN_CODE=${KONTENA_INITIAL_ADMIN_CODE} \
-            kontena/server:${KONTENA_VERSION}
+            -e VAULT_KEY=${kontena_vault_key} -e VAULT_IV=${kontena_vault_iv} \
+            -e INITIAL_ADMIN_CODE=${kontena_initial_admin_code} \
+            kontena/server:${kontena_version}
         ExecStop=/usr/bin/docker stop kontena-server-api
 
     - name: kontena-server-haproxy.service

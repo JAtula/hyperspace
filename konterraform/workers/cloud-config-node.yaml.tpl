@@ -4,10 +4,10 @@ write_files:
     permissions: 0600
     owner: root
     content: |
-      KONTENA_URI=${KONTENA_URI}
-      KONTENA_TOKEN=${KONTENA_TOKEN}
-      KONTENA_PEER_INTERFACE=${KONTENA_PEER_INTERFACE}
-      KONTENA_VERSION=${KONTENA_VERSION}
+      KONTENA_URI=${kontena_uri}
+      KONTENA_TOKEN=${kontena_worker_token}
+      KONTENA_PEER_INTERFACE=${kontena_peer_interface}
+      KONTENA_VERSION=${kontena_version}
   - path: /etc/systemd/system/docker.service.d/50-kontena.conf
     content: |
         [Service]
@@ -27,7 +27,7 @@ coreos:
       content: |
         # default should not match virtual Docker/weave bridge/veth network interfaces
         [Match]
-        Name=${KONTENA_PEER_INTERFACE}
+        Name=${kontena_peer_interface}
 
         [Network]
         DHCP=yes
@@ -60,12 +60,12 @@ coreos:
         EnvironmentFile=/etc/kontena-agent.env
         ExecStartPre=-/usr/bin/docker stop kontena-agent
         ExecStartPre=-/usr/bin/docker rm kontena-agent
-        ExecStartPre=/usr/bin/docker pull kontena/agent:${KONTENA_VERSION}
+        ExecStartPre=/usr/bin/docker pull kontena/agent:${kontena_version}
         ExecStart=/usr/bin/docker run --name kontena-agent \
-            -e KONTENA_URI=${KONTENA_URI} \
-            -e KONTENA_TOKEN=${KONTENA_TOKEN} \
-            -e KONTENA_PEER_INTERFACE=${KONTENA_PEER_INTERFACE} \
+            -e KONTENA_URI=${kontena_uri} \
+            -e KONTENA_TOKEN=${kontena_worker_token} \
+            -e KONTENA_PEER_INTERFACE=${kontena_peer_interface} \
             -v=/var/run/docker.sock:/var/run/docker.sock \
             -v=/etc/kontena-agent.env:/etc/kontena.env \
             --net=host \
-            kontena/agent:${KONTENA_VERSION}
+            kontena/agent:${kontena_version}
