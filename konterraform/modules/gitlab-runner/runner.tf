@@ -1,10 +1,14 @@
-# provider google in gitlab.tf
-# resource google_compute_network gitlab_network in gitlab.tf
+provider "google" {
+    credentials = "${file("${var.auth_file}")}"
+    project = "${var.project}"
+    region = "${var.region}"
+}
+
 data "template_file" "runner_host" {
     template = "$${runner_host == "GENERATE" ? generated_host : runner_host}"
     vars {
       runner_host = "${var.runner_host}"
-      generated_host = "http${var.ssl_certificate != "/dev/null" ? "s" : ""}://${var.dns_name}"
+      generated_host = "http://${var.dns_name}"
     }
 }
 
@@ -47,7 +51,7 @@ resource "google_compute_instance" "gitlab-ci-runner" {
     provisioner "remote-exec" {
         inline = [
             "chmod +x /tmp/bootstrap_runner",
-            "sudo /tmp/bootstrap_runner ${google_compute_instance.gitlab-ci-runner.name} ${data.template_file.runner_host.rendered} ${data.template_file.gitlab.vars.runner_token} ${var.runner_image}"
+            "sudo /tmp/bootstrap_runner ${google_compute_instance.gitlab-ci-runner.name} ${data.template_file.runner_host.rendered} ${var.runner_token} ${var.runner_image}"
         ]
     }
 

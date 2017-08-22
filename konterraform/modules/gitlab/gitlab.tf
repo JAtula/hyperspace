@@ -12,7 +12,7 @@ resource "google_compute_network" "gitlab_network" {
 }
 
 resource "google_compute_firewall" "external_ports_ssl" {
-    count = "${var.ssl_certificate != "/dev/null" ? var.deploy_gitlab ? 1 : 0 : 0}"
+    count = "${var.ssl_certificate != "/dev/null" ? 1 : 0}"
     name = "${var.prefix}${var.external_ports_name}"
     network = "${var.network}"
 

@@ -14,8 +14,8 @@ module "master" {
   kontena_initial_admin_code = "Demo600"
   kontena_vault_key = "GENERATE"
   kontena_vault_iv  = "GENERATE"
-  kontena_token = "GENERATE"
-  kontena_grid_size = "3"
+//  kontena_token = "GENERATE"
+//  kontena_grid_size = "3"
   template_file = "${file("${path.module}/modules/master/cloud-config.yaml.tpl")}"
 }
 
@@ -26,7 +26,8 @@ module "workers"{
   source  = "modules/workers"
   kontena_version = "${module.master.kontena_version}"
   kontena_uri = "${module.master.master_name}.c.konterraform.internal"
-  kontena_worker_token = "${module.master.kontena_token}"
+//  kontena_worker_token = "${module.master.kontena_token}"
+  kontena_worker_token = "asd123asd"
   kontena_peer_interface = "ens4v1"
   template_file_workers = "${file("${path.module}/modules/workers/cloud-config-node.yaml.tpl")}"
 
@@ -58,7 +59,20 @@ module "gitlab" {
   prefix      = "gitlab-"
   dns_name    = "gitlab-ce.c.konterraform.internal"
   external_url = "https://gitlab.demo.io"
-  ssl_key     = "private.key"
-  ssl_certificate = "public.crt"
   runner_count = 1
+  }
+
+//
+// GITLAB-RUNNER
+//
+module "gitlab-runner" {
+  source = "modules/gitlab-runner"
+  auth_file = "konterraform-f36234d1ed7d.json"
+  project = "konterraform"
+  region = "europe-west1"
+  zone = "europe-west1-b"
+  prefix      = "gitlab-"
+  dns_name    = "${module.gitlab.gitlab_instance_name}.c.konterraform.internal"
+  runner_count = 1
+  runner_token = "${module.gitlab.runner_token}"
   }

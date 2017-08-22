@@ -27,16 +27,6 @@ variable "network" {
     default = "default"
 }
 
-variable "public_ports_ssl" {
-    description = "A list of ports that need to be opened for GitLab to work"
-    default = ["80", "443", "22"]
-}
-
-variable "public_ports_no_ssl" {
-    description = "A list of ports that need to be opened for GitLab to work"
-    default = ["80", "443", "22"]
-}
-
 variable "region" {
     description = "The region this all lives in. TODO can this be inferred from zone or vice versa?"
     default = "us-central1"
@@ -52,31 +42,8 @@ variable "data_volume_type" {
     default = "pd-standard"
 }
 
-variable "external_ports_name" {
-    description = "The name of the external ports object, can be used to reuse lists"
-    default =  "gitlab-external-ports"
-}
-
-variable "external_url" {
-    description = "The external url to connect to"
-}
-
-variable "instance_name" {
-    description = "The name of the instance to use"
-    default = "gitlab-instance"
-}
-
-variable "config_file" {
-    description = "Configuration file to use for /etc/gitlab/gitlab.rb"
-}
-
 variable "dns_name" {
     description = "The DNS name of the GitLab instance."
-}
-
-variable "dns_zone" {
-    description = "The name of the DNS zone in Google Cloud that the DNS name should go under"
-    default = "no_dns"
 }
 
 variable "project" {
@@ -86,26 +53,6 @@ variable "project" {
 variable "ssh_key" {
     description = "The ssh key to use to connect to the Google Cloud Instance"
     default = "~/.ssh/google_compute_engine"
-}
-
-variable "ssl_key" {
-    description = "The SSL keyfile to use"
-    default = "/dev/null"
-}
-
-variable "ssl_certificate" {
-    description = "The SSL certificate file to use"
-    default = "/dev/null"
-}
-
-variable "deploy_gitlab" {
-    description = "Enable / Disable deploying a GitLab instance"
-    default = true
-}
-
-variable "initial_root_password" {
-    description = "Set the initial admin password, generated if not provided"
-    default = "GENERATE"
 }
 
 variable "prefix" {
@@ -124,7 +71,6 @@ variable "runner_host" {
 
 variable "runner_token" {
     description = "GitLab CI Runner registration token. Will be generated if not provided"
-    default = "GENERATE"
 }
 
 variable "runner_disk_size" {
