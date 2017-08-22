@@ -1,5 +1,4 @@
 konterraform/terraform.tfstate*
-konterraform/workers/terraform.tfstate*
 konterraform/*.json
 konterraform/private.key
 konterraform/*.c*

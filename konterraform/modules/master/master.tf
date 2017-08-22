@@ -52,7 +52,7 @@ resource "google_compute_instance" "kontena-master" {
 
   provisioner "remote-exec" {
       inline = [
-          "kontena grid create default --initial-size  --token $KONTENA_TOKEN"
+          "kontena grid create default --initial-size ${var.kontena_grid_size} --token $KONTENA_TOKEN"
       ]
     connection {
         type     = "ssh"
@@ -67,7 +67,7 @@ resource "google_compute_instance" "kontena-master" {
 // NETWORKING
 //
 
-resource "google_compute_firewall" "fwrule" {
+/*resource "google_compute_firewall" "fwrule" {
     name = "kontena-fwr"
     network = "default"
     allow {
@@ -75,17 +75,17 @@ resource "google_compute_firewall" "fwrule" {
         ports = ["80","443","22"]
     }
 
-}
+}*/
 
 
 // PHERIPERALS
 
 resource "random_id" "kontena_vault_key" {
-    byte_length = 15
+    byte_length = 64
 }
 
 resource "random_id" "kontena_vault_iv" {
-    byte_length = 15
+    byte_length = 64
 }
 
 resource "random_id" "kontena_token" {
@@ -103,6 +103,7 @@ data "template_file" "cloud_config" {
     kontena_vault_iv = "${var.kontena_vault_iv != "GENERATE" ? var.kontena_vault_iv : format("%s", random_id.kontena_vault_iv.hex)}"
     kontena_token = "${var.kontena_token != "GENERATE" ? var.kontena_token : format("%s", random_id.kontena_token.hex)}"
     kontena_initial_admin_code = "${var.kontena_initial_admin_code}"
+    kontena_grid_size = "${var.kontena_grid_size}"
   }
     
 }
@@ -127,4 +128,8 @@ output "kontena_token" {
 
 output "master_ip" {
     value = "${google_compute_address.master-ip.address}"
+}
+
+output "master_name" {
+    value = "${google_compute_instance.kontena-master.name}"
 }

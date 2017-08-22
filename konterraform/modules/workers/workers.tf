@@ -148,12 +148,3 @@ resource "google_compute_global_forwarding_rule" "default" {
   target     = "${google_compute_target_https_proxy.default.self_link}"
   port_range = "443"
 }
-
-resource "google_compute_firewall" "fwrule" {
-    name = "kontena-workers-fwr"
-    network = "default"
-    allow {
-        protocol = "tcp"
-        ports = ["80","443","22"]
-    }
-}

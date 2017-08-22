@@ -19,10 +19,10 @@ variable "kontena_initial_admin_code" {
     description = "Initial admin code to connect to master API"
 }
 
-//variable "kontena_grid_size" {
-//    description = "Initial grid size"
-//    default     = "3"
-//}
+variable "kontena_grid_size" {
+    description = "Initial grid size"
+    default     = "3"
+}
 
 variable "kontena_token" {
     description = "Kontena token"

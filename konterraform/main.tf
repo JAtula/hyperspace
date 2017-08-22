@@ -9,26 +9,26 @@
 // KONTENA MASTER
 //
 module "master" {
-  source  = "./master"
+  source  = "modules/master"
   kontena_version = "1.3"
   kontena_initial_admin_code = "Demo600"
   kontena_vault_key = "GENERATE"
   kontena_vault_iv  = "GENERATE"
   kontena_token = "GENERATE"
-//  kontena_grid_size = "3"
-  template_file = "${file("${path.module}/master/cloud-config.yaml.tpl")}"
+  kontena_grid_size = "3"
+  template_file = "${file("${path.module}/modules/master/cloud-config.yaml.tpl")}"
 }
 
 //
 // KONTENA WORKERS
 //
 module "workers"{
-  source  = "./workers"
+  source  = "modules/workers"
   kontena_version = "${module.master.kontena_version}"
-  kontena_uri = "https://10.132.0.2"
+  kontena_uri = "${module.master.master_name}.c.konterraform.internal"
   kontena_worker_token = "${module.master.kontena_token}"
   kontena_peer_interface = "ens4v1"
-  template_file_workers = "${file("${path.module}/workers/cloud-config-node.yaml.tpl")}"
+  template_file_workers = "${file("${path.module}/modules/workers/cloud-config-node.yaml.tpl")}"
 
 }
 
@@ -36,7 +36,7 @@ module "workers"{
 // GITLAB DISK
 //
 module "disk" {
-  source  = "./disk"
+  source  = "modules/disk"
   disk_name  = "gitlab-disk"
   disk_type  = "pd-ssd"
   disk_zone  = "europe-west1-b"
@@ -47,15 +47,16 @@ module "disk" {
 // GITLAB
 //
 module "gitlab" {
-  source = "./gitlab"
+  instance_name = "ce"
+  source = "modules/gitlab"
   auth_file = "konterraform-f36234d1ed7d.json"
   project = "konterraform"
   region = "europe-west1"
   zone = "europe-west1-b"
   config_file = "/dev/null"
   data_volume = "${module.disk.disk_name}"
-  prefix      = "gitlab"
-  dns_name    = "http://localhost"
+  prefix      = "gitlab-"
+  dns_name    = "gitlab-ce.c.konterraform.internal"
   external_url = "https://gitlab.demo.io"
   ssl_key     = "private.key"
   ssl_certificate = "public.crt"

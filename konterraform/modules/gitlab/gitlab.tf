@@ -48,11 +48,12 @@ resource "random_id" "runner_token" {
 }
 
 data "template_file" "gitlab" {
-    template = "${file("${path.module}/templates/gitlab.rb.append")}"
+    template = "${file("${path.module}/templates/gitlab.rb.tpl")}"
 
     vars {
         initial_root_password = "${var.initial_root_password != "GENERATE" ? var.initial_root_password : format("%s", random_id.initial_root_password.hex)}"
         runner_token = "${var.runner_token != "GENERATE" ? var.runner_token : format("%s", random_id.runner_token.hex)}"
+        external_url = "${var.external_url}"
     }
 }
 
@@ -94,7 +95,7 @@ resource "google_compute_instance" "gitlab-ce" {
 
     provisioner "file" {
         content = "${data.template_file.gitlab.rendered}"
-        destination = "/tmp/gitlab.rb.append"
+        destination = "/tmp/gitlab.rb.tpl"
     }
 
     provisioner "file" {
@@ -119,7 +120,7 @@ resource "google_compute_instance" "gitlab-ce" {
 
     provisioner "remote-exec" {
         inline = [
-            "cat /tmp/gitlab.rb.append >> /tmp/gitlab.rb",
+            "cat /tmp/gitlab.rb.tpl >> /tmp/gitlab.rb",
             "chmod +x /tmp/bootstrap",
             "sudo /tmp/bootstrap ${var.dns_name}"
         ]
@@ -147,5 +148,9 @@ output "initial_root_password" {
 
 output "runner_token" {
     value = "${data.template_file.gitlab.vars.runner_token}"
+}
+
+output "gitlab_instance_name" {
+    value = "${google_compute_instance.gitlab-ce.name}"
 }
 # vim: sw=4 ts=4
