@@ -1,0 +1,22 @@
+stack: loadbalancer
+version: 1.0.0
+description: Load balancer 
+expose: lb
+variables:
+  lb_node:
+    type: string
+    default: node-1
+    from:
+      prompt: Node for LB
+services:
+  lb:
+    image: kontena/lb:latest
+    ports:
+      - 80:80
+      - 443:443
+    affinity:
+      - node=={{ lb_node }}
+    secrets:
+      - secret: SSL_CERT
+        name: SSL_CERTS
+        type: env

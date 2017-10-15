@@ -11,8 +11,8 @@
     prefix = "gitlab-"
     instance_name = "ce"
     internal_address = "10.132.0.2"
-    ssl_certificate = "gitlab.crt"
-    ssl_key = "gitlab.key"
+    ssl_certificate = "private.crt"
+    ssl_key = "private.key"
     ssh_key = "~/.ssh/google_compute_engine"
   }
 
