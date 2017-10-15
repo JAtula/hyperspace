@@ -10,5 +10,5 @@ The actual 80's style game is a fork from Ken Pratts repo: https://github.com/ke
  * Kontena
  * Terraform
  * GitLab
- ...
+ * ...
  
