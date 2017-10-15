@@ -12,7 +12,7 @@ The actual 80's style game is a fork from Ken Pratts repo: https://github.com/ke
  * GitLab
  * ...
 
- ### Easiest way to generate self-signed cert for SSL connections
+ ### Easiest way to generate self-signed cert for HTTPS
 
  ```
  openssl genrsa -out private.key 2048 && openssl req -x509 -new -nodes -key private.key -out private.crt -days 3650 -subj '/CN=demo'
