@@ -1,8 +1,0 @@
-stack: demo/hyperspace
-version: 1.0.0
-variables:
-services:
-  hyperspace:
-    image: jatula/hyperspace:0.1
-    ports:
-      - 80:9393

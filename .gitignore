@@ -1,7 +1,6 @@
-konterraform/terraform.tfstate*
-konterraform/*.json
-konterraform/private.key
-konterraform/*.c*
-konterraform/kontena-master.pem
-konterraform/.terraform
-konterraform/konterraform-f36234d1ed7d.json
+private.*
+gitlab.*
+terraform.*
+.terraform
+crash.log
+cloud.json

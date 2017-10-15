@@ -1,34 +1,14 @@
-# hyperspace
+# Hyperspace
 
-A real-time multiplayer space shooter.
+A real-time multiplayer space shooter run on a scaling and auto healing Kontena cluster. A project that you can read more about on my blog [here](https://blog.mecloud.online).
 
-## Development
+The actual 80's style game is a fork from Ken Pratts repo: https://github.com/kenpratt/hyperspace
 
- * Run `make` to run a local copy at http://localhost:9393.
+## Tools used
 
- * Run `./watch` to run a local copy that auto-restarts when server files are changed (requires fswatch - `brew install fswatch`)
-
-## Installation
-
-### Add to Nginx configuration
-
-Add to bottom of http block:
-
-```conf
-include /srv/hyperspace/etc/nginx.conf;
-```
-
-Add systemd service:
-
-```sh
-sudo ln -s /srv/hyperspace/etc/hyperspace.service /etc/systemd/system/
-sudo systemctl start hyperspace
-```
-
-
-### Add dependencies
-
-```sh
-go get github.com/gorilla/websocket
-go get github.com/lucasb-eyer/go-colorful
-```
+ * Docker
+ * Kontena
+ * Terraform
+ * GitLab
+ ...
+ 
