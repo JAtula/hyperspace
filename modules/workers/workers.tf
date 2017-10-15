@@ -76,6 +76,7 @@ resource "google_compute_instance_template" "worker-node" {
   }
   metadata  {
     user-data="${data.template_file.cloud_config_nodes.rendered}"
+    sshKeys = "core:${file("${var.ssh_key}.pub")}"
   }
 
 }
@@ -97,7 +98,6 @@ data "template_file" "cloud_config_nodes" {
     kontena_uri = "${var.kontena_uri}"
     kontena_worker_token = "${var.kontena_worker_token}"
     kontena_peer_interface = "${var.kontena_peer_interface}"
-    ssh_key = "${file(var.ssh_key)}"
    }
     
 }

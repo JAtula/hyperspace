@@ -1,7 +1,4 @@
 #cloud-config
-ssh_authorized_keys:
-  - "${ssh_key}"
-
 write_files:
   - path: /etc/kontena-agent.env
     permissions: 0600
