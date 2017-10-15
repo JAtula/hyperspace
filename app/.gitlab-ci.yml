@@ -6,10 +6,12 @@
 
 variables:
   IMAGE_PREFIX: "jatula"
-  IMAGE_TAG: $CI_PIPELINE_ID
+  IMAGE_TAG: "$CI_PIPELINE_ID"
   IMAGE_NAME: "hyperspace"
-  SERVICE_ENDPOINT: https://kontena-master/v1/services/demogrid/hyperspace/game
-  STACK_ENDPOINT: https://kontena-master/v1/stacks/demogrid/hyperspace
+  MASTER_URL: "https://kontena-master"
+  GRID_NAME: "hyperspace"
+  SERVICE_ENDPOINT: "$MASTER_URL/v1/services/$GRID_NAME/hyperspace/game"
+  STACK_ENDPOINT: "$MASTER_URL/v1/stacks/$GRID_NAME/hyperspace"
 
 stages:
   - build-docker
