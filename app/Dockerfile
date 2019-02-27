@@ -1,11 +1,15 @@
 FROM golang:1.9-alpine
-RUN apk update && apk add git 
+
+RUN adduser -s /bin/sh -D -H runner && \
+    apk update && apk add git 
 WORKDIR /home/root/hyperspace
 ADD . .
-RUN touch tmp/server.pid && \
-    go get github.com/gorilla/websocket && \
+RUN go get github.com/gorilla/websocket && \
     go get github.com/lucasb-eyer/go-colorful && \
     cd server && \
-    go build
+    go build && \
+    chown -R runner:runner ./server
 EXPOSE 9393
-ENTRYPOINT ./server/server -port 9393 echo $$! > tmp/server.pid
+
+USER runner:runner
+ENTRYPOINT ./server/server -port 9393 echo $$!
